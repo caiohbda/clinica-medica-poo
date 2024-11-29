@@ -12,9 +12,9 @@ import java.util.Scanner;
 
 public class ConsultaController implements IConsultaController {
 
-    private List<Consulta> consultas = new ArrayList<>();
-    private List<Paciente> pacientes;
-    private List<Medico> medicos;
+    private final List<Consulta> consultas = new ArrayList<>();
+    private final List<Paciente> pacientes;
+    private final List<Medico> medicos;
 
     public ConsultaController(List<Paciente> pacientes, List<Medico> medicos) {
         this.pacientes = pacientes;

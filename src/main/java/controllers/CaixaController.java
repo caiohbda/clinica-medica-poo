@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CaixaController implements ICaixaController {
-    private List<Caixa> movimentacoes = new ArrayList<>();
+    private final List<Caixa> movimentacoes = new ArrayList<>();
     private double saldo;
 
     public CaixaController() {

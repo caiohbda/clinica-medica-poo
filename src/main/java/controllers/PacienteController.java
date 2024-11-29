@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class PacienteController implements IPacienteController {
-    private List<Paciente> pacientes = new ArrayList<>();
-
-    private Scanner input = new Scanner(System.in);
+    private final List<Paciente> pacientes = new ArrayList<>();
+    private final Scanner input = new Scanner(System.in);
 
     public List<Paciente> getPacientes() {
         return pacientes;

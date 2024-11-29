@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class MedicoController implements IMedicoController {
-    private List<Medico> medicos = new ArrayList<>();
-    private Scanner input = new Scanner(System.in);
+    private final List<Medico> medicos = new ArrayList<>();
+    private final Scanner input = new Scanner(System.in);
 
 
     public List<Medico> getMedicos() {
