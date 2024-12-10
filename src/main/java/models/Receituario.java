@@ -1,15 +1,34 @@
 package models;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "receituarios")
 public class Receituario {
+
+    @Id
+    @Column(name = "id_receituario")
     private String idReceituario;
+
+    @ManyToOne
+    @JoinColumn(name = "id_paciente", nullable = false)
     private Paciente paciente;
+
+    @ManyToOne
+    @JoinColumn(name = "id_medico", nullable = false)
     private Medico medico;
+
+    @Column(name = "data_emissao", nullable = false)
     private LocalDate dataEmissao;
+
+    @Column(name = "medicamentos", nullable = false, columnDefinition = "TEXT")
     private String medicamentos;
+
+    @Column(name = "observacoes", columnDefinition = "TEXT")
     private String observacoes;
 
+    // Construtores, getters e setters
     public Receituario() {
     }
 
