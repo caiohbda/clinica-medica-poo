@@ -1,16 +1,37 @@
 package models;
 
-import java.util.Date;
+import jakarta.persistence.*;
 import utils.DataUtil;
+import java.util.Date;
 
+@Entity
+@Table(name = "consultas")
 public class Consulta {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @ManyToOne
+    @JoinColumn(name = "paciente_id", nullable = false)
     private Paciente paciente;
+
+    @ManyToOne
+    @JoinColumn(name = "medico_id", nullable = false)
     private Medico medico;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "data_consulta", nullable = false)
     private Date dataConsulta;
+
+    @Column(name = "descricao", length = 500)
     private String descricao;
+
+    @Column(name = "valor", nullable = false)
     private double valor;
+
+    public Consulta() {
+    }
 
     public Consulta(int id, Paciente paciente, Medico medico, Date dataConsulta, String descricao, double valor) {
         this.id = id;

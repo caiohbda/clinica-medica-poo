@@ -1,8 +1,11 @@
 package Interfaces;
 
+import java.util.List;
+
 public interface IMedicoController {
     void criarMedico();
     void alterarMedico();
-    void listarTodosMedicos();
+    List listarTodosMedicos();
     void removerMedico();
+    void buscarMedicoPorId();
 }

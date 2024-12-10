@@ -21,8 +21,4 @@ public class DataUtil {
             return null;
         }
     }
-
-    public static String dateToString(Date date) {
-        return DATE_FORMAT.format(date);
-    }
 }

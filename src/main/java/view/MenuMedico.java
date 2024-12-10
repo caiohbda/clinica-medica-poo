@@ -12,7 +12,8 @@ public class MenuMedico {
             System.out.println("2. Alterar Médico");
             System.out.println("3. Ver Médicos Cadastrados");
             System.out.println("4. Deletar Médico");
-            System.out.println("5. Voltar ao menu principal");
+            System.out.println("5. Buscar Medico pelo Id");
+            System.out.println("6. Voltar ao menu principal");
             System.out.print("Escolha uma opção: ");
 
             medicoOption = scanner.nextInt();
@@ -31,11 +32,14 @@ public class MenuMedico {
                     medicoController.removerMedico();
                     break;
                 case 5:
+                    medicoController.buscarMedicoPorId();
+                    break;
+                case 6:
                     System.out.println("Voltando ao menu principal...");
                     break;
                 default:
                     System.out.println("Opção inválida! Tente novamente.");
             }
-        } while (medicoOption != 5);
+        } while (medicoOption != 6);
     }
 }

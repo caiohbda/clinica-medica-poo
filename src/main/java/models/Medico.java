@@ -1,10 +1,20 @@
 package models;
 
-public class Medico {
+import jakarta.persistence.*;
 
+@Table(name="medico")
+@Entity
+public class Medico {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    @Column(name = "crm")
     private String crm;
+    @Column(name = "nome")
     private String nome;
+    @Column(name = "especialidade")
     private String especialidade;
+    @Column(name = "idade")
     private String idade;
 
     public Medico(String crm, String nome, String especialidade, String idade) {
@@ -12,6 +22,10 @@ public class Medico {
         this.nome = nome;
         this.especialidade = especialidade;
         this.idade = idade;
+    }
+
+    public Medico() {
+
     }
 
     public String getCrm() {
@@ -46,10 +60,20 @@ public class Medico {
         this.idade = idade;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void exibirMedico() {
-        System.out.println("CRM: " + crm);
-        System.out.println("Nome: " + nome);
-        System.out.println("Especialidade: " + especialidade);
-        System.out.println("Idade: " + idade);
+        System.out.println("=====MEDICO=====");
+        System.out.println("Nome do Medico: " + this.getNome());
+        System.out.println("CRM do Medico: " + this.getCrm());
+        System.out.println("Especialidade do Medico: " + this.getEspecialidade());
+        System.out.println("Idade do Medico: " + this.getIdade());
+        System.out.println("===================");
     }
 }

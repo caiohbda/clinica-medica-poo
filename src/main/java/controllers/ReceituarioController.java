@@ -1,5 +1,6 @@
 package controllers;
 
+import Interfaces.IReceituarioController;
 import models.Receituario;
 import models.Paciente;
 import models.Medico;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ReceituarioController {
+public class ReceituarioController implements IReceituarioController {
     private final List<Receituario> receituarios = new ArrayList<>();
     private final List<Paciente> pacientes;
     private final List<Medico> medicos;

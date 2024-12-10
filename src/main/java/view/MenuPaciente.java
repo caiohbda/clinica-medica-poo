@@ -9,7 +9,7 @@ public class MenuPaciente {
         do {
             System.out.println("===== Menu Paciente =====");
             System.out.println("1. Criar Paciente");
-            System.out.println("2. Buscar Paciente");
+            System.out.println("2. Buscar Paciente por Id");
             System.out.println("3. Alterar Paciente");
             System.out.println("4. Ver Pacientes Cadastrados");
             System.out.println("5. Deletar Paciente");
@@ -23,7 +23,7 @@ public class MenuPaciente {
                     pacienteController.criarPaciente();
                     break;
                 case 2:
-                    pacienteController.buscarPacientePorCPF();
+                    pacienteController.buscarPacientePorId();
                     break;
                 case 3:
                     pacienteController.alterarPaciente();

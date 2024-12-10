@@ -1,17 +1,35 @@
 package models;
 
+import jakarta.persistence.*;
 import utils.DataUtil;
 import java.util.Date;
 
+@Table(name = "Caixa")
+@Entity
 public class Caixa {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "tipo")
     private String tipo;
+
+    @Column(name = "valor")
     private double valor;
+
+    @Column(name = "data")
     private Date data;
+
+    @Column(name = "descricao")
     private String descricao;
+
+    @Column(name = "formaPagamento")
     private String formaPagamento;
 
+    public Caixa() {
+    }
+
+    // Construtor com argumentos
     public Caixa(int id, String tipo, double valor, Date data, String descricao, String formaPagamento) {
         this.id = id;
         this.tipo = tipo;
@@ -21,6 +39,7 @@ public class Caixa {
         this.formaPagamento = formaPagamento;
     }
 
+    // Getters e setters
     public int getId() {
         return id;
     }

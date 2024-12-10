@@ -1,5 +1,4 @@
 package controllers;
-
 import Interfaces.IConsultaController;
 import models.Consulta;
 import models.Paciente;

@@ -1,16 +1,19 @@
 package controllers;
+
 import Interfaces.IPacienteController;
 import models.Paciente;
-import java.util.ArrayList;
+import repositories.PacienteRepository;
 import java.util.List;
 import java.util.Scanner;
 
 public class PacienteController implements IPacienteController {
-    private final List<Paciente> pacientes = new ArrayList<>();
-    private final Scanner input = new Scanner(System.in);
 
-    public List<Paciente> getPacientes() {
-        return pacientes;
+    private final PacienteRepository pacienteRepository = new PacienteRepository();
+    private final Scanner input = new Scanner(System.in);
+    private List<Paciente> pacientesCache;
+
+    public PacienteController() {
+        this.pacientesCache = pacienteRepository.findAll();
     }
 
     @Override
@@ -26,58 +29,46 @@ public class PacienteController implements IPacienteController {
 
         Paciente paciente = new Paciente(CPF, nome, idade);
 
-        pacientes.add(paciente);
-
+        pacienteRepository.save(paciente);
+        pacientesCache.add(paciente);
         System.out.println("Paciente criado com sucesso!");
     }
 
     @Override
     public void alterarPaciente() {
-        System.out.print("Digite o CPF do paciente a ser alterado: ");
-        String CPF = input.next();
+        System.out.print("Digite o ID do paciente a ser alterado: ");
+        int id = input.nextInt();
 
-        Paciente pacienteEncontrado = null;
-        for (Paciente p : pacientes) {
-            if (p.getCPF().equals(CPF)) {
-                pacienteEncontrado = p;
-                break;
-            }
-        }
+        Paciente paciente = pacienteRepository.findById(id);
 
-        if (pacienteEncontrado != null) {
-            System.out.println("Paciente encontrado!");
-            System.out.println("Nome atual: " + pacienteEncontrado.getNome());
-            System.out.println("Idade atual: " + pacienteEncontrado.getIdade());
-            System.out.println("O que deseja alterar?");
-            System.out.println("1. Nome");
-            System.out.println("2. Idade");
-            System.out.println("3. Cancelar");
+        if (paciente != null) {
+            System.out.println("Paciente encontrado: ");
+            System.out.println("Nome atual: " + paciente.getNome());
+            System.out.println("Idade atual: " + paciente.getIdade());
+            System.out.println("CPF atual: " + paciente.getCPF());
 
-            int opcao = input.nextInt();
-
-            switch (opcao) {
-                case 1:
-                    System.out.print("Digite o novo nome: ");
-                    String novoNome = input.next();
-                    pacienteEncontrado.setNome(novoNome);
-                    System.out.println("Nome alterado com sucesso!");
-                    break;
-
-                case 2:
-                    System.out.print("Digite a nova idade: ");
-                    String novaIdade = input.next();
-                    pacienteEncontrado.setIdade(novaIdade);
-                    System.out.println("Idade alterada com sucesso!");
-                    break;
-
-                case 3:
-                    System.out.println("Alteração cancelada.");
-                    break;
-
-                default:
-                    System.out.println("Opção inválida!");
+            System.out.print("Digite o novo nome (ou pressione Enter para manter o atual): ");
+            input.nextLine();
+            String novoNome = input.nextLine();
+            if (!novoNome.isEmpty()) {
+                paciente.setNome(novoNome);
             }
 
+            System.out.print("Digite a nova idade (ou pressione Enter para manter a atual): ");
+            String novaIdade = input.nextLine();
+            if (!novaIdade.isEmpty()) {
+                paciente.setIdade(novaIdade);
+            }
+
+            System.out.print("Digite o novo CPF (ou pressione Enter para manter o atual): ");
+            String novoCpf = input.nextLine();
+            if (!novoCpf.isEmpty()) {
+                paciente.setCPF(novoCpf);
+            }
+
+            pacienteRepository.save(paciente);
+            pacientesCache = pacienteRepository.findAll();
+            System.out.println("Paciente atualizado com sucesso!");
         } else {
             System.out.println("Paciente não encontrado.");
         }
@@ -85,19 +76,13 @@ public class PacienteController implements IPacienteController {
 
     @Override
     public void removerPaciente() {
-        System.out.print("Digite o CPF do paciente a remover: ");
-        String CPF = input.next();
+        System.out.print("Digite o Id do paciente a remover: ");
+        int id = input.nextInt();
 
-        Paciente pacienteRemovido = null;
-        for (Paciente p : pacientes) {
-            if (p.getCPF().equals(CPF)) {
-                pacienteRemovido = p;
-                break;
-            }
-        }
-
-        if (pacienteRemovido != null) {
-            pacientes.remove(pacienteRemovido);
+        Paciente paciente = pacienteRepository.findById(id);
+        if (paciente != null) {
+            pacienteRepository.remove(paciente);
+            pacientesCache.remove(paciente);
             System.out.println("Paciente removido com sucesso!");
         } else {
             System.out.println("Paciente não encontrado.");
@@ -105,37 +90,29 @@ public class PacienteController implements IPacienteController {
     }
 
     @Override
-    public void buscarPacientePorCPF() {
-        System.out.print("Digite o CPF do paciente: ");
-        String CPF = input.next();
-
-        Paciente pacienteEncontrado = null;
-        for (Paciente p : pacientes) {
-            if (p.getCPF().equals(CPF)) {
-                pacienteEncontrado = p;
-                break;
-            }
+    public List<Paciente> listarTodosPacientes() {
+        pacientesCache = pacienteRepository.findAll();
+        for (Paciente paciente : pacientesCache) {
+            paciente.exibirPaciente();
         }
+        return pacientesCache;
+    }
 
-        if (pacienteEncontrado != null) {
-            System.out.println("Informações do Paciente:");
-            System.out.println("Nome: " + pacienteEncontrado.getNome());
-            System.out.println("Idade: " + pacienteEncontrado.getIdade());
-            System.out.println("CPF: " + pacienteEncontrado.getCPF());
+    public void buscarPacientePorId() {
+        System.out.println("Digite o Id do paciente: ");
+        int id = input.nextInt();
+        Paciente paciente = pacienteRepository.findById(id);
+        if (paciente != null) {
+            paciente.exibirPaciente();
         } else {
             System.out.println("Paciente não encontrado.");
         }
     }
 
-    @Override
-    public void listarTodosPacientes() {
-        if (pacientes.isEmpty()) {
-            System.out.println("Não há pacientes cadastrados.");
-        } else {
-            System.out.println("Listando todos os pacientes:");
-            for (Paciente paciente : pacientes) {
-                System.out.println("Nome: " + paciente.getNome() + ", CPF: " + paciente.getCPF() + ", Idade: " + paciente.getIdade());
-            }
+    public List<Paciente> getPacientes() {
+        if (pacientesCache.isEmpty()) {
+            pacientesCache = pacienteRepository.findAll();
         }
+        return pacientesCache;
     }
 }

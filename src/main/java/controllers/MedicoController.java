@@ -1,19 +1,16 @@
 package controllers;
-import Interfaces.IMedicoController;
+
+import repositories.MedicoRepository;
 import models.Medico;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class MedicoController implements IMedicoController {
-    private final List<Medico> medicos = new ArrayList<>();
+public class MedicoController {
+    private final MedicoRepository medicoRepository = new MedicoRepository();
+    private List<Medico> medicosCache = new ArrayList<>();
     private final Scanner input = new Scanner(System.in);
 
-
-    public List<Medico> getMedicos() {
-        return medicos;
-    }
-    @Override
     public void criarMedico() {
         System.out.print("Digite o CRM do médico: ");
         String crm = input.next();
@@ -28,97 +25,91 @@ public class MedicoController implements IMedicoController {
         String idade = input.next();
 
         Medico medico = new Medico(crm, nome, especialidade, idade);
-
-        medicos.add(medico);
+        medicoRepository.save(medico);
 
         System.out.println("Médico criado com sucesso!");
     }
-    @Override
+
     public void alterarMedico() {
-        System.out.print("Digite o CRM do médico a ser alterado: ");
-        String crm = input.next();
+        System.out.print("Digite o ID do Médico a ser alterado: ");
+        int id = input.nextInt();
 
-        Medico medicoEncontrado = null;
-        for (Medico m : medicos) {
-            if (m.getCrm().equals(crm)) {
-                medicoEncontrado = m;
-                break;
+        Medico medico = medicoRepository.findById(id);
+
+        if (medico != null) {
+            System.out.println("Médico encontrado: ");
+            medico.exibirMedico();
+
+            System.out.print("Digite o novo nome (ou pressione Enter para manter o atual): ");
+            input.nextLine();
+            String novoNome = input.nextLine();
+            if (!novoNome.isEmpty()) {
+                medico.setNome(novoNome);
             }
-        }
 
-        if (medicoEncontrado != null) {
-            System.out.println("Médico encontrado!");
-            System.out.println("Nome atual: " + medicoEncontrado.getNome());
-            System.out.println("Especialidade atual: " + medicoEncontrado.getEspecialidade());
-            System.out.println("Idade atual: " + medicoEncontrado.getIdade());
-
-            System.out.println("O que deseja alterar?");
-            System.out.println("1. Nome");
-            System.out.println("2. Especialidade");
-            System.out.println("3. Idade");
-            System.out.println("4. Cancelar");
-
-            int opcao = input.nextInt();
-
-            switch (opcao) {
-                case 1:
-                    System.out.print("Digite o novo nome: ");
-                    String novoNome = input.next();
-                    medicoEncontrado.setNome(novoNome);
-                    System.out.println("Nome alterado com sucesso!");
-                    break;
-                case 2:
-                    System.out.print("Digite a nova especialidade: ");
-                    String novaEspecialidade = input.next();
-                    medicoEncontrado.setEspecialidade(novaEspecialidade);
-                    System.out.println("Especialidade alterada com sucesso!");
-                    break;
-                case 3:
-                    System.out.print("Digite a nova idade: ");
-                    String novaIdade = input.next();
-                    medicoEncontrado.setIdade(novaIdade);
-                    System.out.println("Idade alterada com sucesso!");
-                    break;
-                case 4:
-                    System.out.println("Alteração cancelada.");
-                    break;
-                default:
-                    System.out.println("Opção inválida!");
+            System.out.print("Digite a nova idade (ou pressione Enter para manter a atual): ");
+            String novaIdade = input.nextLine();
+            if (!novaIdade.isEmpty()) {
+                medico.setIdade(novaIdade);
             }
+
+            System.out.print("Digite o novo CRM (ou pressione Enter para manter o atual): ");
+            String novoCRM = input.nextLine();
+            if (!novoCRM.isEmpty()) {
+                medico.setCrm(novoCRM);
+            }
+
+            System.out.println("Digite a nova Especialidade (ou pressione Enter para manter o atual): ");
+            String novaEspecialidade = input.nextLine();
+            if (!novaEspecialidade.isEmpty()) {
+                medico.setEspecialidade(novaEspecialidade);
+            }
+
+            medicoRepository.update(medico);
+
+            System.out.println("Médico atualizado com sucesso!");
         } else {
             System.out.println("Médico não encontrado.");
         }
     }
-    @Override
+
     public void removerMedico() {
-        System.out.print("Digite o CRM do médico a remover: ");
-        String crm = input.next();
+        System.out.print("Digite o Id do médico a remover: ");
+        String Id = input.next();
+        Medico medico = medicoRepository.findById(Integer.parseInt(Id));
 
-        Medico medicoRemovido = null;
-        for (Medico m : medicos) {
-            if (m.getCrm().equals(crm)) {
-                medicoRemovido = m;
-                break;
-            }
-        }
-
-        if (medicoRemovido != null) {
-            medicos.remove(medicoRemovido);
+        if (medico != null) {
+            medicoRepository.delete(Integer.parseInt(Id));
             System.out.println("Médico removido com sucesso!");
         } else {
             System.out.println("Médico não encontrado.");
         }
     }
-    @Override
-    public void listarTodosMedicos() {
-        if (medicos.isEmpty()) {
-            System.out.println("Não há médicos cadastrados.");
-        } else {
-            System.out.println("Listando todos os médicos:");
-            for (Medico medico : medicos) {
-                medico.exibirMedico();
-                System.out.println("---------------------------------");
-            }
+
+    public List<Medico> listarTodosMedicos() {
+        medicosCache = medicoRepository.findAll();
+        for (Medico medico : medicosCache) {
+            medico.exibirMedico();
         }
+        return medicosCache;
+    }
+
+    public void buscarMedicoPorId() {
+        System.out.print("Digite o Id do Médico: ");
+        int id = input.nextInt();
+        Medico medico = medicoRepository.findById(id);
+
+        if (medico != null) {
+            medico.exibirMedico();
+        } else {
+            System.out.println("Médico não encontrado.");
+        }
+    }
+
+    public List<Medico> getMedicos() {
+        if (medicosCache.isEmpty()) {
+            medicosCache = medicoRepository.findAll();
+        }
+        return medicosCache;
     }
 }
