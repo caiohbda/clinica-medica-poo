@@ -1,54 +1,44 @@
 package controllers;
+
 import Interfaces.IConsultaController;
 import models.Consulta;
 import models.Paciente;
 import models.Medico;
+import repositories.ConsultaRepository;
 import utils.DataUtil;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
+
+
 public class ConsultaController implements IConsultaController {
 
-    private final List<Consulta> consultas = new ArrayList<>();
-    private final List<Paciente> pacientes;
-    private final List<Medico> medicos;
+    private List<Consulta> cacheConsultas = new ArrayList<>();
+    private final List<Paciente> cachePacientes;
+    private final List<Medico> cacheMedicos;
+
+    private final PacienteController pc = new PacienteController();
+    private final MedicoController mc = new MedicoController();
+
+    private final ConsultaRepository cr = new ConsultaRepository();
 
     public ConsultaController(List<Paciente> pacientes, List<Medico> medicos) {
-        this.pacientes = pacientes;
-        this.medicos = medicos;
-    }
-
-    public void listarPacientes() {
-        if (pacientes.isEmpty()) {
-            System.out.println("Não há pacientes cadastrados.");
-        } else {
-            System.out.println("===== Pacientes Cadastrados =====");
-            for (Paciente paciente : pacientes) {
-                System.out.println("Nome: " + paciente.getNome() + " | CPF: " + paciente.getCPF());
-            }
-        }
-    }
-
-    public void listarMedicos() {
-        if (medicos.isEmpty()) {
-            System.out.println("Não há médicos cadastrados.");
-        } else {
-            System.out.println("===== Médicos Cadastrados =====");
-            for (Medico medico : medicos) {
-                System.out.println("Nome: " + medico.getNome() + " | CRM: " + medico.getCrm());
-            }
-        }
+        this.cachePacientes = pacientes;
+        this.cacheMedicos = medicos;
     }
 
     public void agendarConsulta(Scanner scanner) {
         System.out.println("===== Agendar Consulta =====");
-        listarPacientes();
+
+        pc.listarTodosPacientes();
         System.out.print("Digite o CPF do paciente: ");
         String cpfPaciente = scanner.next();
         Paciente pacienteSelecionado = null;
-        for (Paciente paciente : pacientes) {
+
+        for (Paciente paciente : cachePacientes) {
             if (paciente.getCPF().equals(cpfPaciente)) {
                 pacienteSelecionado = paciente;
                 break;
@@ -60,11 +50,12 @@ public class ConsultaController implements IConsultaController {
             return;
         }
 
-        listarMedicos();
+        mc.listarTodosMedicos();
         System.out.print("Digite o CRM do médico: ");
         String crmMedico = scanner.next();
         Medico medicoSelecionado = null;
-        for (Medico medico : medicos) {
+
+        for (Medico medico : cacheMedicos) {
             if (medico.getCrm().equals(crmMedico)) {
                 medicoSelecionado = medico;
                 break;
@@ -105,41 +96,45 @@ public class ConsultaController implements IConsultaController {
         System.out.print("Digite o valor da consulta: R$ ");
         double valor = scanner.nextDouble();
 
-        int consultaId = consultas.size() + 1;
-        Consulta novaConsulta = new Consulta(consultaId, pacienteSelecionado, medicoSelecionado, dataConsulta, descricao, valor);
-        consultas.add(novaConsulta);
+        Consulta novaConsulta = new Consulta(0, pacienteSelecionado, medicoSelecionado, dataConsulta, descricao, valor);
+
+        cr.save(novaConsulta);
+        cacheConsultas.add(novaConsulta);
 
         System.out.println("Consulta agendada com sucesso!");
     }
 
-    public void listarConsultas() {
-        if (consultas.isEmpty()) {
+    public List<Consulta> listarConsultas() {
+        cacheConsultas = cr.findAll();
+        if (cacheConsultas.isEmpty()) {
             System.out.println("Não há consultas agendadas.");
         } else {
             System.out.println("===== Consultas Agendadas =====");
-            for (Consulta consulta : consultas) {
+            for (Consulta consulta : cacheConsultas) {
                 consulta.exibirConsulta();
             }
         }
+        return cacheConsultas;
     }
 
     @Override
     public void cancelarConsulta(Scanner scanner) {
         System.out.println("===== Cancelar Consulta =====");
         listarConsultas();
-        System.out.print("Digite o ID da consulta a ser cancelada: ");
 
+        System.out.print("Digite o ID da consulta a ser cancelada: ");
         while (!scanner.hasNextInt()) {
             System.out.println("Por favor, insira um número válido para o ID da consulta.");
-            scanner.next();  // Limpar a entrada inválida
+            scanner.next();
             System.out.print("Digite o ID da consulta a ser cancelada: ");
         }
         int idConsulta = scanner.nextInt();
 
         boolean consultaCancelada = false;
-        for (Consulta consulta : consultas) {
+        for (Consulta consulta : cacheConsultas) {
             if (consulta.getId() == idConsulta) {
-                consultas.remove(consulta);
+                cr.delete(idConsulta);
+                cacheConsultas.remove(consulta);
                 consultaCancelada = true;
                 System.out.println("Consulta cancelada com sucesso!");
                 break;
@@ -151,12 +146,11 @@ public class ConsultaController implements IConsultaController {
         }
     }
 
-
     public void alterarConsulta(Scanner scanner) {
         System.out.println("===== Alterar Consulta =====");
         listarConsultas();
-        System.out.print("Digite o ID da consulta a ser alterada: ");
 
+        System.out.print("Digite o ID da consulta a ser alterada: ");
         while (!scanner.hasNextInt()) {
             System.out.println("Por favor, insira um número válido para o ID da consulta.");
             scanner.next();
@@ -164,57 +158,54 @@ public class ConsultaController implements IConsultaController {
         }
         int idConsulta = scanner.nextInt();
 
-        boolean consultaEncontrada = false;
-        for (Consulta consulta : consultas) {
-            if (consulta.getId() == idConsulta) {
-                consultaEncontrada = true;
+        Consulta consulta = cacheConsultas.stream()
+                .filter(c -> c.getId() == idConsulta)
+                .findFirst()
+                .orElse(null);
 
-                System.out.println("Consulta encontrada. Vamos alterar os dados.");
-
-                System.out.print("Digite a nova data da consulta (dd/MM/yyyy): ");
-                String dataStr = scanner.next();
-                Date novaData = DataUtil.stringToDate(dataStr);
-                if (novaData == null) {
-                    System.out.println("Data inválida! A consulta não pode ser alterada.");
-                    return;
-                }
-
-                System.out.print("Digite a nova hora da consulta (hh:mm): ");
-                String horaStr = scanner.next();
-                String[] horaParts = horaStr.split(":");
-                if (horaParts.length == 2) {
-                    int hora = Integer.parseInt(horaParts[0]);
-                    int minuto = Integer.parseInt(horaParts[1]);
-                    novaData.setHours(hora);
-                    novaData.setMinutes(minuto);
-                } else {
-                    System.out.println("Hora inválida. A consulta será alterada sem hora específica.");
-                }
-
-                System.out.print("Digite a nova descrição da consulta: ");
-                scanner.nextLine();
-                String novaDescricao = scanner.nextLine();
-
-                System.out.print("Digite o novo valor da consulta: R$ ");
-                while (!scanner.hasNextDouble()) {
-                    System.out.println("Por favor, insira um valor válido para o novo valor da consulta.");
-                    scanner.next();
-                    System.out.print("Digite o novo valor da consulta: R$ ");
-                }
-                double novoValor = scanner.nextDouble();
-
-                consulta.setDataConsulta(novaData);
-                consulta.setDescricao(novaDescricao);
-                consulta.setValor(novoValor);
-
-                System.out.println("Consulta alterada com sucesso!");
-                break;
-            }
-        }
-
-        if (!consultaEncontrada) {
+        if (consulta == null) {
             System.out.println("Consulta não encontrada.");
+            return;
         }
-    }
 
+        System.out.println("Consulta encontrada. Vamos alterar os dados.");
+
+        System.out.print("Digite a nova data da consulta (dd/MM/yyyy): ");
+        String dataStr = scanner.next();
+        Date novaData = DataUtil.stringToDate(dataStr);
+        if (novaData == null) {
+            System.out.println("Data inválida! A consulta não pode ser alterada.");
+            return;
+        }
+
+        System.out.print("Digite a nova hora da consulta (hh:mm): ");
+        String horaStr = scanner.next();
+        String[] horaParts = horaStr.split(":");
+        if (horaParts.length == 2) {
+            int hora = Integer.parseInt(horaParts[0]);
+            int minuto = Integer.parseInt(horaParts[1]);
+            novaData.setHours(hora);
+            novaData.setMinutes(minuto);
+        }
+
+        System.out.print("Digite a nova descrição da consulta: ");
+        scanner.nextLine();
+        String novaDescricao = scanner.nextLine();
+
+        System.out.print("Digite o novo valor da consulta: R$ ");
+        while (!scanner.hasNextDouble()) {
+            System.out.println("Por favor, insira um valor válido para o novo valor da consulta.");
+            scanner.next();
+            System.out.print("Digite o novo valor da consulta: R$ ");
+        }
+        double novoValor = scanner.nextDouble();
+
+        consulta.setDataConsulta(novaData);
+        consulta.setDescricao(novaDescricao);
+        consulta.setValor(novoValor);
+
+        cr.update(consulta);
+
+        System.out.println("Consulta alterada com sucesso!");
+    }
 }

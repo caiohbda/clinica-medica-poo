@@ -62,6 +62,7 @@ public class Paciente {
 
     public void exibirPaciente() {
         System.out.println("=====PACIENTE=====");
+        System.out.println("Id: " + this.getId());
         System.out.println("Nome: " + this.getNome());
         System.out.println("Idade: " + this.getIdade());
         System.out.println("CPF: " + this.getCPF());

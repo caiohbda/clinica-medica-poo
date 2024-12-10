@@ -70,6 +70,7 @@ public class Medico {
 
     public void exibirMedico() {
         System.out.println("=====MEDICO=====");
+        System.out.println("Id: " + this.getId());
         System.out.println("Nome do Medico: " + this.getNome());
         System.out.println("CRM do Medico: " + this.getCrm());
         System.out.println("Especialidade do Medico: " + this.getEspecialidade());
