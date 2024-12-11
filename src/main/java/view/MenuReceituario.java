@@ -25,16 +25,16 @@ public class MenuReceituario {
 
             switch (opcao) {
                 case 1:
-                    controller.criarReceituario();
+                    controller.criarReceituario(input);
                     break;
                 case 2:
-                    controller.alterarReceituario();
+                    controller.alterarReceituario(input);
                     break;
                 case 3:
-                    controller.removerReceituario();
+                    controller.removerReceituario(input);
                     break;
                 case 4:
-                    controller.listarTodosReceituarios();
+                    controller.listarReceituarios();
                     break;
                 case 5:
                     System.out.println("Voltando ao menu principal...");

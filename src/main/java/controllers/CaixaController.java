@@ -2,22 +2,23 @@ package controllers;
 
 import Interfaces.ICaixaController;
 import models.Caixa;
-import java.util.ArrayList;
+import repositories.CaixaRepository;
 import java.util.List;
 
 public class CaixaController implements ICaixaController {
-    private final List<Caixa> movimentacoes = new ArrayList<>();
+    private final CaixaRepository caixaRepository;
     private double saldo;
 
     public CaixaController() {
-        this.saldo = 0.0;
+        this.caixaRepository = new CaixaRepository();
+        this.saldo = calcularSaldo();
     }
 
     @Override
     public void registrarEntrada(double valor, String descricao, String formaPagamento) {
         if (valor > 0) {
-            Caixa entrada = new Caixa(movimentacoes.size() + 1, "Entrada", valor, new java.util.Date(), descricao, formaPagamento);
-            movimentacoes.add(entrada);
+            Caixa entrada = new Caixa(0, "Entrada", valor, new java.util.Date(), descricao, formaPagamento);
+            caixaRepository.save(entrada);
             saldo += valor;
             System.out.println("Entrada registrada: R$ " + valor);
         } else {
@@ -28,8 +29,8 @@ public class CaixaController implements ICaixaController {
     @Override
     public void registrarSaida(double valor, String descricao, String formaPagamento) {
         if (valor > 0 && valor <= saldo) {
-            Caixa saida = new Caixa(movimentacoes.size() + 1, "Saída", valor, new java.util.Date(), descricao, formaPagamento);
-            movimentacoes.add(saida);
+            Caixa saida = new Caixa(0, "Saída", valor, new java.util.Date(), descricao, formaPagamento);
+            caixaRepository.save(saida);
             saldo -= valor;
             System.out.println("Saída registrada: R$ " + valor);
         } else if (valor > saldo) {
@@ -41,6 +42,7 @@ public class CaixaController implements ICaixaController {
 
     @Override
     public void exibirExtrato() {
+        List<Caixa> movimentacoes = caixaRepository.findAll();
         if (movimentacoes.isEmpty()) {
             System.out.println("Não há movimentações registradas.");
         } else {
@@ -50,5 +52,18 @@ public class CaixaController implements ICaixaController {
             }
             System.out.println("Saldo atual: R$ " + saldo);
         }
+    }
+
+    private double calcularSaldo() {
+        List<Caixa> movimentacoes = caixaRepository.findAll();
+        double saldoCalculado = 0;
+        for (Caixa movimentacao : movimentacoes) {
+            if ("Entrada".equals(movimentacao.getTipo())) {
+                saldoCalculado += movimentacao.getValor();
+            } else {
+                saldoCalculado -= movimentacao.getValor();
+            }
+        }
+        return saldoCalculado;
     }
 }

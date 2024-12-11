@@ -8,8 +8,8 @@ import java.time.LocalDate;
 public class Receituario {
 
     @Id
-    @Column(name = "id_receituario")
-    private String idReceituario;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;  // Agora o id é do tipo int
 
     @ManyToOne
     @JoinColumn(name = "id_paciente", nullable = false)
@@ -28,25 +28,25 @@ public class Receituario {
     @Column(name = "observacoes", columnDefinition = "TEXT")
     private String observacoes;
 
-    // Construtores, getters e setters
-    public Receituario() {
-    }
-
-    public Receituario(String idReceituario, Paciente paciente, Medico medico, LocalDate dataEmissao, String medicamentos, String observacoes) {
-        this.idReceituario = idReceituario;
+    public Receituario(Paciente paciente, Medico medico, String medicamentos, String observacoes, LocalDate dataEmissao) {
         this.paciente = paciente;
         this.medico = medico;
-        this.dataEmissao = dataEmissao;
         this.medicamentos = medicamentos;
         this.observacoes = observacoes;
+        this.dataEmissao = dataEmissao;
     }
 
-    public String getIdReceituario() {
-        return idReceituario;
+    public Receituario() {
+
     }
 
-    public void setIdReceituario(String idReceituario) {
-        this.idReceituario = idReceituario;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Paciente getPaciente() {
@@ -90,12 +90,13 @@ public class Receituario {
     }
 
     public void exibirReceituario() {
-        System.out.println("===== Receituário =====");
-        System.out.println("ID: " + idReceituario);
+        System.out.println("===== Receita =====");
+        System.out.println("ID: " + id);  // Agora o ID é acessado por "id"
         System.out.println("Paciente: " + paciente.getNome() + " (CPF: " + paciente.getCPF() + ")");
         System.out.println("Médico: " + medico.getNome() + " (CRM: " + medico.getCrm() + ")");
         System.out.println("Data de Emissão: " + dataEmissao);
         System.out.println("Medicamentos: " + medicamentos);
         System.out.println("Observações: " + observacoes);
+        System.out.println("========================");
     }
 }

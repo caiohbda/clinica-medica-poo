@@ -29,7 +29,6 @@ public class Caixa {
     public Caixa() {
     }
 
-    // Construtor com argumentos
     public Caixa(int id, String tipo, double valor, Date data, String descricao, String formaPagamento) {
         this.id = id;
         this.tipo = tipo;
