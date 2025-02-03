@@ -1,5 +1,5 @@
-🏥 Clínica Médica - Sistema de Gestão
-Este é um projeto desenvolvido em Java para a gestão de uma clínica médica. O sistema permite o agendamento de consultas, o controle do fluxo de caixa e o gerenciamento de pacientes e médicos, proporcionando uma administração eficiente e organizada da clínica.
+##🏥 Clínica Médica - Sistema de Gestão
+**Este é um projeto desenvolvido em Java para a gestão de uma clínica médica. O sistema permite o agendamento de consultas, o controle do fluxo de caixa e o gerenciamento de pacientes e médicos, proporcionando uma administração eficiente e organizada da clínica.**
 
 ✨ Funcionalidades
 📅 Agendamento de Consultas: Cadastro, edição e cancelamento de consultas médicas.
